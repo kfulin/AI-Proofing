@@ -1,21 +1,22 @@
 # backend/api/upload.py
 
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, Form
 import shutil
 import os
 
 router = APIRouter()
 
-# Define the directory to save uploaded files
 UPLOAD_DIR = "uploaded_images"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), label: str = Form(...)):
     file_path = os.path.join(UPLOAD_DIR, file.filename)
     
-    # Save the uploaded file to the server
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    return {"filename": file.filename, "status": "success"}
+    # Save label information (for demonstration, we just print it)
+    print(f"Received file: {file.filename} with label: {label}")
+
+    return {"filename": file.filename, "label": label, "status": "success"}
